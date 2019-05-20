@@ -1,8 +1,10 @@
 import { Component } from '@angular/core';
 import {NgRedux} from '@angular-redux/store';
 import {AppState} from './state';
-import {decrement, increment} from './actions';
+import {decrement, enterpriseRandomRequest, enterpriseRandomSuccess, increment} from './actions';
 import {Observable} from 'rxjs';
+import {HttpClient} from '@angular/common/http';
+import {EnterpriseRandom} from './model';
 
 @Component({
   selector: 'app-root',
@@ -10,13 +12,16 @@ import {Observable} from 'rxjs';
   <div>Count: {{count$ | async}}
     <button (click)="decrement()">-</button>
     <button (click)="increment()">+</button>
+    <button (click)="enterpriseRandom()">Enterprise Random ©</button> <span *ngIf="fetching$ | async"> Randomizing Enterpriseyly...</span>
   </div>`
 })
 export class AppComponent {
   private count$: Observable<number>;
+  private fetching$: Observable<boolean>;
 
-  constructor(private ngRedux: NgRedux<AppState>) {
+  constructor(private ngRedux: NgRedux<AppState>, private http: HttpClient) {
     this.count$ = this.ngRedux.select(s => s.count);
+    this.fetching$ = this.ngRedux.select(s => s.fetching);
   }
 
   decrement() {
@@ -25,5 +30,11 @@ export class AppComponent {
 
   increment() {
     this.ngRedux.dispatch(increment());
+  }
+
+  enterpriseRandom() {
+    this.ngRedux.dispatch(enterpriseRandomRequest());
+    this.http.get<EnterpriseRandom>('http://localhost:8080/enterprise-random/')
+      .subscribe(r => this.ngRedux.dispatch(enterpriseRandomSuccess(r)));
   }
 }
