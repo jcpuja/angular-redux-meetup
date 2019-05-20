@@ -6,6 +6,8 @@ import {DevToolsExtension, NgRedux, NgReduxModule} from '@angular-redux/store';
 import {HttpClientModule} from '@angular/common/http';
 import {AppState, INITIAL_STATE} from './state';
 import {rootReducer} from './reducers';
+import {combineEpics, createEpicMiddleware} from 'redux-observable';
+import {Epics} from './epics';
 
 @NgModule({
   declarations: [
@@ -20,8 +22,12 @@ import {rootReducer} from './reducers';
   bootstrap: [AppComponent]
 })
 export class AppModule {
-  constructor(private devTools: DevToolsExtension, private ngRedux: NgRedux<AppState>) {
-    this.ngRedux.configureStore(rootReducer, INITIAL_STATE, [], this.getDevToolsEnhancer());
+  constructor(private devTools: DevToolsExtension, private ngRedux: NgRedux<AppState>, private epics: Epics) {
+    const epicMiddleware = createEpicMiddleware();
+
+    this.ngRedux.configureStore(rootReducer, INITIAL_STATE, [epicMiddleware], this.getDevToolsEnhancer());
+
+    epicMiddleware.run(epics.enterpriseRandomEpic);
   }
 
 

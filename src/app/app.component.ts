@@ -1,10 +1,9 @@
-import { Component } from '@angular/core';
+import {Component} from '@angular/core';
 import {NgRedux} from '@angular-redux/store';
 import {AppState} from './state';
-import {decrement, enterpriseRandomRequest, enterpriseRandomSuccess, increment} from './actions';
+import {decrement, enterpriseRandomRequest, increment} from './actions';
 import {Observable} from 'rxjs';
 import {HttpClient} from '@angular/common/http';
-import {EnterpriseRandom} from './model';
 
 @Component({
   selector: 'app-root',
@@ -34,7 +33,5 @@ export class AppComponent {
 
   enterpriseRandom() {
     this.ngRedux.dispatch(enterpriseRandomRequest());
-    this.http.get<EnterpriseRandom>('http://localhost:8080/enterprise-random/')
-      .subscribe(r => this.ngRedux.dispatch(enterpriseRandomSuccess(r)));
   }
 }
